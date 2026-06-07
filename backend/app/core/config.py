@@ -1,6 +1,7 @@
 from functools import lru_cache
+from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,16 +14,16 @@ class Settings(BaseSettings):
     )
 
     asr_base_url: str = "https://api.groq.com/openai/v1"
-    asr_api_key: str = ""
+    asr_api_key: SecretStr = SecretStr("")
     asr_model: str = "whisper-large-v3"
 
     llm_base_url: str = "https://api.openai.com/v1"
-    llm_api_key: str = ""
+    llm_api_key: SecretStr = SecretStr("")
     llm_model: str = "gpt-4o-mini"
 
-    auth_token: str = ""
+    auth_token: SecretStr = SecretStr("")
 
-    data_dir: str = "./data"
+    data_dir: Path = Path("./data")
 
     binance_base_url: str = "https://api.binance.com"
     bybit_base_url: str = "https://api.bybit.com"
@@ -35,19 +36,6 @@ class Settings(BaseSettings):
             "http://localhost:8000",
         ]
     )
-
-    def __repr__(self) -> str:
-        return (
-            f"Settings(asr_base_url={self.asr_base_url!r}, "
-            f"asr_model={self.asr_model!r}, "
-            f"llm_base_url={self.llm_base_url!r}, "
-            f"llm_model={self.llm_model!r}, "
-            f"data_dir={self.data_dir!r}, "
-            f"binance_base_url={self.binance_base_url!r}, "
-            f"bybit_base_url={self.bybit_base_url!r}, "
-            f"kline_cache_ttl_seconds={self.kline_cache_ttl_seconds!r}, "
-            f"cors_origins={self.cors_origins!r})"
-        )
 
 
 @lru_cache
