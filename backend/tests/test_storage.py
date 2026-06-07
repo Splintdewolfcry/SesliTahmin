@@ -214,6 +214,39 @@ def test_save_is_atomic(tmp_path: Path):
     assert data["id"] == p.id
 
 
+def test_list_skips_corrupt_json(tmp_path: Path, caplog: pytest.LogCaptureFixture):
+    """A single corrupt file must not break list() — it gets logged and skipped."""
+    import logging
+
+    store = PredictionStore(tmp_path)
+    p = _make_prediction()
+    store.save(p)
+    # Drop a corrupt file in the predictions dir
+    (store.predictions_dir / "corrupt.json").write_text("{not valid json", encoding="utf-8")
+
+    with caplog.at_level(logging.WARNING, logger="app.services.storage"):
+        results = store.list()
+
+    assert len(results) == 1
+    assert results[0].id == p.id
+    assert any("corrupt" in r.message for r in caplog.records)
+
+
+def test_delete_refuses_audio_outside_audio_dir(tmp_path: Path):
+    """A prediction with an audio_path outside the store's audio_dir must NOT be deleted."""
+    store = PredictionStore(tmp_path)
+    outside = tmp_path / "outside.wav"
+    outside.write_bytes(b"do-not-touch")
+    p = _make_prediction(audio_path=str(outside))
+    store.save(p)
+
+    store.delete(p.id)
+
+    # JSON removed, but the outside file is untouched
+    assert not (store.predictions_dir / f"{p.id}.json").exists()
+    assert outside.exists()
+
+
 def test_singleton_store_shares_data_dir(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     # Reset lru_caches for this test
     get_settings.cache_clear()
