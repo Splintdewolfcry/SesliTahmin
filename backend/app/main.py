@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
 from app.core.config import get_settings
-from app.routers import predictions as predictions_router
+from app.routers import asr_router, predictions as predictions_router, prices
 from app.services.asr import close_asr_client
 from app.services.llm import close_openai_client
 from app.services.prices import close_http_client
@@ -37,6 +37,8 @@ app.add_middleware(
 )
 
 app.include_router(predictions_router.router)
+app.include_router(asr_router.router)
+app.include_router(prices.router)
 
 
 @app.get("/")
