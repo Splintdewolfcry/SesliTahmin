@@ -1,15 +1,27 @@
+from contextlib import asynccontextmanager
+from typing import AsyncIterator
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
 from app.core.config import get_settings
 from app.routers import predictions as predictions_router
+from app.services.prices import close_http_client
 
 settings = get_settings()
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    yield
+    await close_http_client()
+
 
 app = FastAPI(
     title="SesliTahmin API",
     version=__version__,
+    lifespan=lifespan,
 )
 
 app.add_middleware(
