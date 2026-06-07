@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
 from app.core.config import get_settings
+from app.routers import predictions as predictions_router
 
 settings = get_settings()
 
@@ -18,6 +19,8 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PATCH", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
 )
+
+app.include_router(predictions_router.router)
 
 
 @app.get("/")
