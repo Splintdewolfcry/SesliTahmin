@@ -8,6 +8,7 @@ from app import __version__
 from app.core.config import get_settings
 from app.routers import predictions as predictions_router
 from app.services.prices import close_http_client
+from app.services.llm import close_openai_client
 
 settings = get_settings()
 
@@ -16,6 +17,7 @@ settings = get_settings()
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     yield
     await close_http_client()
+    await close_openai_client()
 
 
 app = FastAPI(
