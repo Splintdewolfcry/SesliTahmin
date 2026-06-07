@@ -28,8 +28,6 @@ from app.services.prices import (
     get_kline_cache,
 )
 
-pytestmark = pytest.mark.asyncio
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -439,5 +437,3 @@ async def test_close_http_client_is_idempotent() -> None:
     new_client = get_http_client()
     assert not new_client.is_closed
     await close_http_client()
-    # Suppress unused warning
-    _ = client, new_client
